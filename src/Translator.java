@@ -75,6 +75,27 @@ public class Translator {
 		return match;
 	}
 	
+	private boolean print(String cmd, boolean print) {
+		
+	}
+
+
+	private boolean if_check(String cmd, boolean print) {
+		
+	}
+	
+	private boolean then_check(String cmd, boolean print) {
+		
+	}
+	
+	private boolean else_check(String cmd, boolean print) {
+		
+	}
+	
+	private boolean comparator(String cmd, boolean print) {
+		
+	}
+	
 	private boolean var(String cmd, boolean print) {
 		Matcher m = var.matcher(cmd);
 		boolean match = m.find();
@@ -105,6 +126,10 @@ public class Translator {
 		}
 		printMsg(match, "<val>", cmd, "value");
 		return match;
+	}
+	
+	private boolean op(String cmd, boolean print) {
+		
 	}
 		
 	private static void printMsg(boolean match, String ntName, String cmd, String item) {
