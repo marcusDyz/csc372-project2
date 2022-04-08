@@ -8,11 +8,17 @@ import com.sun.org.apache.xerces.internal.impl.dv.dtd.StringDatatypeValidator;
 
 public class Translator {
 	private Pattern var_assign = Pattern.compile("^(.+) = (.+)\\.$");
+	private Pattern print = Pattern.compile("^print (.+)$");
+	private Pattern if_check = Pattern.compile("^if (.+)$");
+	private Pattern then_check = Pattern.compile("^then (.+)$");
+	private Pattern else_check = Pattern.compile("else (.+)$");
+	private Pattern loop = Pattern.compile("^while (.+) ($");
+	private Pattern comparator = Pattern.compile("^>=|<=|==$");
 	private Pattern intVal = Pattern.compile("^\\d+$");
 	private Pattern strVal = Pattern.compile("^\"\\w+\"$");
 	private Pattern var = Pattern.compile("^\\w+$");
-	private Pattern print = Pattern.compile("^print (.+)$");
-	private Pattern bool = Pattern.compile("^t|f$");
+	private Pattern op = Pattern.compile("[+-*/%]");
+	private Pattern bool = Pattern.compile("^TRUE|FALSE$");
 	
 	public static void main(String[] args) {
 		if (args.length == 0) { // Interactive system
@@ -55,6 +61,7 @@ public class Translator {
 	private void parseCmd(String cmd, File out) {
 		
 	}
+	
 	
 	private boolean varAssign(String cmd, boolean print) {
 		Matcher m = var_assign.matcher(cmd);
