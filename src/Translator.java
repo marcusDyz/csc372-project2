@@ -1,8 +1,18 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import com.sun.org.apache.xerces.internal.impl.dv.dtd.StringDatatypeValidator;
 
 public class Translator {
+	private Pattern var_assign = Pattern.compile("^(.+) = (.+)\\.$");
+	private Pattern intVal = Pattern.compile("^\\d+$");
+	private Pattern strVal = Pattern.compile("^\"\\w+\"$");
+	private Pattern var = Pattern.compile("^\\w+$");
+	private Pattern print = Pattern.compile("^print (.+)$");
+	private Pattern bool = Pattern.compile("^t|f$");
 	
 	public static void main(String[] args) {
 		if (args.length == 0) { // Interactive system
@@ -44,6 +54,57 @@ public class Translator {
 	// Private parsing method
 	private void parseCmd(String cmd, File out) {
 		
+	}
+	
+	private boolean varAssign(String cmd, boolean print) {
+		Matcher m = var_assign.matcher(cmd);
+		boolean match = false;
+		if(m.find()) {
+		match = true;
+		match = match && var(m.group(1), print);
+		match = match && val(m.group(2), print);
+		}
+		printMsg(match, "<var_assign>", cmd, "variable assignment statement");
+		return match;
+	}
+	
+	private boolean var(String cmd, boolean print) {
+		Matcher m = var.matcher(cmd);
+		boolean match = m.find();
+		if (print) 
+			printMsg(match, "<var>", cmd, "variable");
+		return match;
+	}
+	
+	private boolean val(String cmd, boolean print) {
+		Matcher m = intVal.matcher(cmd);
+		boolean match = m.find();
+		String result = "";
+		if(match && print) {
+			printMsg(match, "<int>", cmd, "integer");
+		}else if (strVal.matcher(cmd).find() && print) {
+			printMsg(match, "<String>", cmd, "string");
+		}else {
+			m = bool.matcher(cmd);
+			match = m.find();
+			if(match && print)
+				printMsg(match, "<bool>", cmd, "boolean");
+			else {
+				m = var.matcher(cmd);
+				match = m.find();
+				if(match && print)
+					printMsg(match, "<var>", cmd, "variable");
+			}
+		}
+		printMsg(match, "<val>", cmd, "value");
+		return match;
+	}
+		
+	private static void printMsg(boolean match, String ntName, String cmd, String item) {
+		if(match)
+			System.out.println(ntName + ": " + cmd);
+		else
+			System.out.println("Failed to parse: {" + cmd + "} is not a valid " + item + ".");
 	}
 
 }
