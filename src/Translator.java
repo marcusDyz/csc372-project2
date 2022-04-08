@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 import com.sun.org.apache.xerces.internal.impl.dv.dtd.StringDatatypeValidator;
 
+// Author: YD
 public class Translator {
 	private Pattern var_assign = Pattern.compile("^(.+) = (.+)\\.$");
 	private Pattern print = Pattern.compile("^print (.+)$");
