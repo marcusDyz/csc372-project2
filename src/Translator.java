@@ -14,7 +14,7 @@ public class Translator {
 	private static Pattern then_check = Pattern.compile("^then (.+)$");
 	private static Pattern else_check = Pattern.compile("else (.+)$");
 	private static Pattern loop = Pattern.compile("^while (.+) [(]$");
-	private static Pattern comparator = Pattern.compile("^(>=|<=|==)$");
+	private static Pattern comparator = Pattern.compile("^(>|<|>=|<=|==)$");
 	private static Pattern intVal = Pattern.compile("^\\d+$");
 	private static Pattern strVal = Pattern.compile("^\"\\w+\"$");
 	private static Pattern var = Pattern.compile("^\\w+$");
