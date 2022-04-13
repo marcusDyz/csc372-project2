@@ -8,17 +8,20 @@ import java.util.regex.Pattern;
 
 // Author: YD
 public class Translator {
-	private static Pattern var_assign = Pattern.compile("^(.+) = (.+)\\.$");
+	private static Pattern expr = Pattern.compile("^$"); // place holder
+	private static Pattern var_assign = Pattern.compile("^(.+) = (.+)\\$");
 	private static Pattern print_var = Pattern.compile("^print[(](.+)[)]$");
+	private static Pattern print_val = Pattern.compile("^print[(]\"(.+)\"[)]$");
 	private static Pattern if_check = Pattern.compile("^if (.+)$");
 	private static Pattern then_check = Pattern.compile("^then (.+)$");
 	private static Pattern else_check = Pattern.compile("else (.+)$");
 	private static Pattern loop = Pattern.compile("^while (.+) [(]$");
 	private static Pattern comparator = Pattern.compile("^(>|<|>=|<=|==)$");
+	private static Pattern comparative = Pattern.compile("^(.+) (.+) (.+)$");
 	private static Pattern intVal = Pattern.compile("^\\d+$");
 	private static Pattern strVal = Pattern.compile("^\"\\w+\"$");
 	private static Pattern var = Pattern.compile("^\\w+$");
-	private static Pattern op = Pattern.compile("(/+|/-|/*|/%)");
+	private static Pattern op = Pattern.compile("^[/+/-/*/%/~//]{1}$");
 	private static Pattern bool = Pattern.compile("^TRUE|FALSE$");
 	
 	public static void main(String[] args) {
@@ -46,14 +49,15 @@ public class Translator {
 			        System.out.println("File already exists.");
 			      }
 				while (scanner.hasNextLine()) {
-					//String cmd = scanner.nextLine();
+					String cmd = scanner.nextLine();
+					comparative(cmd, true);
 					// TODO Parse every line and translate to a Java code file.
 				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}else { // Accept command line arguments
+		} else { // Accept command line arguments
 			
 		}
 		
@@ -64,14 +68,18 @@ public class Translator {
 		
 	}
 	
+	private static boolean expr(String cmd, boolean print) {
+		// TODO place holder function.
+		return false;
+	}
 	
 	private boolean varAssign(String cmd, boolean print) {
 		Matcher m = var_assign.matcher(cmd);
 		boolean match = false;
 		if(m.find()) {
-		match = true;
-		match = match && var(m.group(1), print);
-		match = match && val(m.group(2), print);
+			match = true;
+			match = match && var(m.group(1), print);
+			match = match && val(m.group(2), print);
 		}
 		printMsg(match, "<var_assign>", cmd, "variable assignment statement");
 		return match;
@@ -82,12 +90,22 @@ public class Translator {
 		boolean match = false;
 		if(m.find() && print) {
 			match = true;
+			match = match && expr(m.group(1), print);
 		}
 		printMsg(match, "<print>", cmd, "print statement");
 		return match;
 	}
 
-
+	public static boolean print_val(String cmd, boolean print) {
+		Matcher m = print_val.matcher(cmd);
+		boolean match = false;
+		if(m.find() && print) {
+			match = true;
+		}
+		printMsg(match, "<print>", cmd, "print statement");
+		return match;
+	}
+	
 	/*private boolean if_check(String cmd, boolean print) {
 		
 	}
@@ -110,7 +128,19 @@ public class Translator {
 		return match;
 	}
 	
-	private boolean var(String cmd, boolean print) {
+	private static boolean comparative(String cmd, boolean print) {
+		Matcher m = comparative.matcher(cmd);
+		boolean match = false;
+		if (m.find()) {
+			match = true;
+			match = match && comparator(m.group(2),print);
+		}
+		printMsg(match, "<comparative>", cmd, "comparative statement");
+		return match;
+	}
+	
+	
+	private static boolean var(String cmd, boolean print) {
 		Matcher m = var.matcher(cmd);
 		boolean match = m.find();
 		if (print) 
