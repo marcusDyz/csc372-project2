@@ -17,7 +17,7 @@ public class Translator {
 	private static Pattern loop = Pattern.compile("^while (.+) \\[$");
 	private static Pattern comparative = Pattern.compile("^(.+) (.+) (.+)$");
 	private static Pattern comparator = Pattern.compile("^(>|<|>=|<=|==)$");
-	private static Pattern bool_expr = Pattern.compile("^\\((.+) (.) (.+)\\)$");
+	private static Pattern bool_expr = Pattern.compile("^\\((.+) [\\^#] (.+)\\)$");
 	private static Pattern expr = Pattern.compile("^\\((.+) (.) (.+)\\)$");
 	private static Pattern end_sign = Pattern.compile("^\\]$");
 	private static Pattern intVal = Pattern.compile("^\\d+$");
@@ -37,7 +37,7 @@ public class Translator {
 			String input = scanner.nextLine();
 			while (!input.equals("exit")) { 
 				// TODO Parse the input string and write it in Java code then print the output.
-				bool_expr1(input, true);
+				bool_expr(input, true);
 				System.out.print(">> ");
 				input = scanner.nextLine();
 			}
@@ -154,7 +154,6 @@ public class Translator {
 		if(m.find()) {
 			match = true;
 			match = match && bool_expr(m.group(1), print);
-			System.out.println(m.group(1));
 			if (print)
 				printMsg(match, "<if>", cmd, "if statement");
 		}
@@ -186,13 +185,12 @@ public class Translator {
 
 
 	private static boolean bool_expr(String cmd, boolean print) { // TODO
-		boolean match = bool_expr1(cmd, print);
-		if(!match) {
-			Matcher m = bool_expr.matcher(cmd);
-			m.find();
-			match = match && bool_expr(m.group(1),print);
-			match = match && and_or(m.group(2),print);
-			match = match && bool_expr1(m.group(3),print);
+		Matcher m = bool_expr.matcher(cmd);
+		boolean match = m.find();
+		match = match && bool_expr(m.group(1),print);
+		match = match && bool_expr1(m.group(2),print);
+		if (!match) {
+			match = bool_expr1(cmd, false);
 		}
 		if (print)
 			printMsg(match, "<bool_expr>", cmd, "boolean expression");
@@ -202,23 +200,24 @@ public class Translator {
 	private static boolean bool_expr1(String cmd, boolean print) { // TODO 
 		Matcher m = comparative.matcher(cmd);
 		boolean match = false;
-		if(m.find() && print) {
+		if(m.find()) {
+			match = true;
 			if (comparative(cmd, false) && print) {
 				comparative(cmd, print);
 			}
-		}
-		if (bool.matcher(cmd).find()) {
+		}else if (bool.matcher(cmd).find()) {
 			match = true;
 			if (bool(cmd, false) && print) {
 				bool(cmd, print);
 			}
-		}
-		if (var.matcher(cmd).find()){
+		}else if (var.matcher(cmd).find()){
 			match = true;
 			if (var(cmd, false) && print) {
 				var(cmd, print);
 			}
 		}
+		if (print)
+			printMsg(match, "<bool_expr1>", cmd, "boolean expression 1");
 		return match;
 	}
 	
