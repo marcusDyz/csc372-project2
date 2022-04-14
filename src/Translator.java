@@ -18,7 +18,7 @@ public class Translator {
 	private static Pattern comparative = Pattern.compile("^(.+) (.+) (.+)$");
 	private static Pattern comparator = Pattern.compile("^(>|<|>=|<=|==)$");
 	private static Pattern bool_expr = Pattern.compile("^\\((.+) (.) (.+)\\)$");
-	private static Pattern expr = Pattern.compile("^\\\\((.+) (.) (.+)\\)$");
+	private static Pattern expr = Pattern.compile("^\\((.+) (.) (.+)\\)$");
 	private static Pattern end_sign = Pattern.compile("^\\]$");
 	private static Pattern intVal = Pattern.compile("^\\d+$");
 	private static Pattern strVal = Pattern.compile("^\"\\w+\"$");
@@ -37,7 +37,7 @@ public class Translator {
 			String input = scanner.nextLine();
 			while (!input.equals("exit")) { 
 				// TODO Parse the input string and write it in Java code then print the output.
-				end_sign(input, true);
+				bool_expr1(input, true);
 				System.out.print(">> ");
 				input = scanner.nextLine();
 			}
@@ -96,7 +96,7 @@ public class Translator {
 		}else if (loop(modified_cmd, false)) {
 			
 		}else if (end_sign(modified_cmd, false)){
-		
+			line_result += "}";
 		}else if (print_var(modified_cmd, false)){
 		
 		}else {
@@ -118,7 +118,7 @@ public class Translator {
 		if(m.find()) {
 			match = true;
 			match = match && var(m.group(1), print);
-			match = match && val(m.group(2), print);
+			match = match && (val(m.group(2), print) || expr(m.group(2), print));
 			if (print)
 				printMsg(match, "<varAssign>", cmd, "varAssign");
 		}
