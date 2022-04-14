@@ -50,7 +50,7 @@ public class Translator {
 			      }
 				while (scanner.hasNextLine()) {
 					String cmd = scanner.nextLine();
-					comparative(cmd, true);
+					//comparative(cmd, true);
 					// TODO Parse every line and translate to a Java code file.
 				}
 			} catch (Exception e) {
