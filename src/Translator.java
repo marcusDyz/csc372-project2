@@ -37,7 +37,7 @@ public class Translator {
 			String input = scanner.nextLine();
 			while (!input.equals("exit")) { 
 				// TODO Parse the input string and write it in Java code then print the output.
-				bool_expr(input, true);
+				varAssign(input, true);
 				System.out.print(">> ");
 				input = scanner.nextLine();
 			}
