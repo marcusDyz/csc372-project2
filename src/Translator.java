@@ -118,11 +118,8 @@ public class Translator {
 			line_result += print_val + ");";
 		}else if (print_var(modified_cmd, false)){
 			line_result += "System.out.println(";
-			//String print_var = 
-			//modified_cmd.substring(modified_cmd.indexOf("(")+1,modified_cmd.indexOf(")"));
 			String print_var = 
 			modified_cmd.substring(6, modified_cmd.length()-1);
-			//System.out.println(print_var);
 			line_result += print_var + ");";
 		}
 		else {
@@ -256,16 +253,10 @@ public class Translator {
 	private static boolean expr(String cmd, boolean print) {
 		boolean match = val(cmd, print);
 		if(!match) {
-			/*
-			System.out.println(cmd.charAt(0));
 			if (!(cmd.charAt(0) == '(' )|| !(cmd.charAt(cmd.length()-1) == ')')) {
 				System.out.println("SYNTAX ERROR: Expression should have parentheses.");
 				System.exit(0);
-			}*/
-			// Might be more complicated than anticipated to determine if 
-			// expression has correct number of parentheses.
-			// Restrict to only be left/right-associative?
-			// Maybe add or statements for checking groups 1 and 2. Ask tomorrow.
+			}
 			Matcher m = expr.matcher(cmd);
 			match = m.find();
 			match = match && expr(m.group(1),print);
