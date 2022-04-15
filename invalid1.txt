@@ -1,0 +1,14 @@
+$ In order to check the invalidity of the program,
+$ you can only check one line at a time.
+$ Use the '$' to comment out all lines except the one you are testing.
+
+$ Variable declaration error.
+i == 1
+$ Compile error: y has not been declared as a variable.
+$ x = y
+$ Improper syntax, should be TRUE.
+$ b = true
+$ Requires parentheses on the outside.
+$ y = 4 * 3
+$ Compile error, x has not been declared as a variable.
+$ print(x)
