@@ -57,11 +57,13 @@ public class Translator {
 			        System.out.println("File already exists.");
 			      }
 				FileWriter writer = new FileWriter(output);
+				initializeOutFile(output_filename.split(".")[0], writer);
 				while (scanner.hasNextLine()) {
 					String cmd = scanner.nextLine();
-					parseCmd(cmd, true);
+					parseCmd(cmd, writer);
 					// TODO Parse every line and translate to a Java code file.
 				}
+				writer.write("}");
 				writer.close();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -73,8 +75,19 @@ public class Translator {
 		
 	}
 	
+	private static void initializeOutFile(String filename, FileWriter out) {
+		String result = "public class " + filename + "{"
+				+ "public static void main(String[] args) {";
+		try {
+			out.write(result);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	// Private parsing method
-	private void parseCmd(String cmd, FileWriter out) {
+	private static void parseCmd(String cmd, FileWriter out) {
 		String line_result = "";
 		String modified_cmd = cmd.trim();
 		if (varAssign(modified_cmd, false)) {
@@ -104,13 +117,22 @@ public class Translator {
 			
 		}else if (end_sign(modified_cmd, false)){
 			line_result += "}";
+		}else if (print_val(modified_cmd, false)) {
+			line_result += "System.out.println(";
+			String print_val =
+			modified_cmd.substring(modified_cmd.indexOf("(")+1,modified_cmd.indexOf(")"));		
+			line_result += print_val + ");";
 		}else if (print_var(modified_cmd, false)){
-		
-		}else {
-			System.out.println("Invalid code detected");
+			line_result += "System.out.println(";
+			String print_var = 
+			modified_cmd.substring(modified_cmd.indexOf("(")+1,modified_cmd.indexOf(")"));
+			line_result += print_var + ");";
+		}
+		else {
+			System.out.println("Invalid code detected.");
 			System.exit(0);
 		}
-		line_result += "\n";
+		System.out.println(line_result);
 		try {
 			out.write(line_result);
 		} catch (IOException e) {
