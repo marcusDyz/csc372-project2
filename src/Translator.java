@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,6 +28,7 @@ public class Translator {
 	private static Pattern op = Pattern.compile("^[+-/%]{1}|\\*$");
 	private static Pattern bool = Pattern.compile("^TRUE|FALSE$");
 	private int end_num = 0; 
+	private static ArrayList<String> variable_list = new ArrayList<String>();
 	
 	
 	public static void main(String[] args) {
@@ -37,7 +39,7 @@ public class Translator {
 			String input = scanner.nextLine();
 			while (!input.equals("exit")) { 
 				// TODO Parse the input string and write it in Java code then print the output.
-				varAssign(input, true);
+				comparative(input, true);
 				System.out.print(">> ");
 				input = scanner.nextLine();
 			}
@@ -57,7 +59,7 @@ public class Translator {
 				FileWriter writer = new FileWriter(output);
 				while (scanner.hasNextLine()) {
 					String cmd = scanner.nextLine();
-					comparative(cmd, true);
+					parseCmd(cmd, true);
 					// TODO Parse every line and translate to a Java code file.
 				}
 				writer.close();
@@ -77,18 +79,23 @@ public class Translator {
 		String modified_cmd = cmd.trim();
 		if (varAssign(modified_cmd, false)) {
 			 String[] cur = modified_cmd.split(" ");
-			 if (intVal.matcher(cur[2]).find()) {
-				 line_result += "int " + modified_cmd;
-			 }else if (strVal.matcher(cur[2]).find()) {
-				 line_result += "String " + modified_cmd;
-			 }else if (bool.matcher(cur[2]).find()) {
-				 line_result += "boolean " + cur[0] + cur[1];
-				 if (cur[2] == "TRUE") {
-					 line_result += "true";
-				 }else {
-					 line_result += "false";
+			 if (variable_list.contains(cur[0])) {
+				 line_result += modified_cmd;
+			 }else {
+				 if (intVal.matcher(cur[2]).find() || expr.matcher(cur[2]).find()) {
+					 line_result += "int " + modified_cmd;
+				 }else if (strVal.matcher(cur[2]).find()) {
+					 line_result += "String " + modified_cmd;
+				 }else if (bool.matcher(cur[2]).find()) {
+					 line_result += "boolean " + cur[0] + cur[1];
+					 if (cur[2] == "TRUE") {
+						 line_result += "true";
+					 }else {
+						 line_result += "false";
+					 }
 				 }
 			 }
+			 System.out.println(line_result);
 		}else if (if_check(modified_cmd, false)) {
 			
 		}else if (else_check(modified_cmd, false)) {
