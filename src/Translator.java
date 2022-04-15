@@ -26,6 +26,7 @@ public class Translator {
 	private static Pattern var = Pattern.compile("^\\w+$");
 	private static Pattern op = Pattern.compile("^[+-/%]{1}|\\*$");
 	private static Pattern bool = Pattern.compile("^TRUE|FALSE$");
+	
 	private int end_num = 0; 
 	private static ArrayList<String> variable_list = new ArrayList<String>();
 	
@@ -98,7 +99,7 @@ public class Translator {
 		}else if (loop(modified_cmd, false)) {
 			
 		}else if (end_sign(modified_cmd, false)){
-		
+			line_result += "};";
 		}else if (print_val(modified_cmd, false)) {
 			line_result += "System.out.println(";
 			String print_val =
@@ -129,7 +130,7 @@ public class Translator {
 		if(m.find()) {
 			match = true;
 			match = match && var(m.group(1), print);
-			match = match && val(m.group(2), print);
+			match = match && val(m.group(2), print) || expr(m.group(2), print);
 			if (print)
 				printMsg(match, "<varAssign>", cmd, "varAssign");
 		}
@@ -170,7 +171,6 @@ public class Translator {
 		if(m.find()) {
 			match = true;
 			match = match && bool_expr(m.group(1), print);
-			//System.out.println(m.group(1));
 			if (print)
 				printMsg(match, "<if>", cmd, "if statement");
 		}
