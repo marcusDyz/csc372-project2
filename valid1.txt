@@ -1,0 +1,18 @@
+i = 0
+x = TRUE 
+while (i < 10) [
+	fl = “First loop”
+	print(fl)
+	j = 0
+	while ((j < 5) # x) [
+		print(“Second loop”)
+	if (j == 4) then [
+	x = FALSE
+	]
+	else [
+	j = j + 1
+	print(j)
+	]
+	i = i + 1
+	print(i)
+]
