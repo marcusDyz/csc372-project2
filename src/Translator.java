@@ -1,8 +1,7 @@
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,7 +26,7 @@ public class Translator {
 	private static Pattern op = Pattern.compile("^[+-/%]{1}|\\*$");
 	private static Pattern bool = Pattern.compile("^TRUE|FALSE$");
 	private int end_num = 0; 
-	private static ArrayList<String> variable_list = new ArrayList<String>();
+	private static HashMap<String, String> variable_list = new HashMap<String, String>();
 	
 	
 	public static void main(String[] args) {
@@ -44,7 +43,7 @@ public class Translator {
 			}
 			System.out.println("Bye!");
 			
-		}else if (args.length == 1) { // Reading file from StdIn
+		}else { // Reading file from StdIn
 			try {
 				Scanner scanner = new Scanner(new File(args[0]));
 				String output_filename = (args[0].split("\\.")[0]) + ".java";
@@ -57,6 +56,13 @@ public class Translator {
 			      }
 				FileWriter writer = new FileWriter(output);
 				initializeOutFile(output_filename.split("\\.")[0], writer);
+				if (args.length > 1) {
+					for (int i=1; i<args.length; i++) {
+						String cla = "CLA" + (i) + " = " + args[i];
+						System.out.println(cla);
+						parseCmd(cla,writer);
+					}
+				}
 				while (scanner.hasNextLine()) {
 					String cmd = scanner.nextLine();
 					parseCmd(cmd, writer);
@@ -68,10 +74,7 @@ public class Translator {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}else { // Accept command line arguments
-			
 		}
-		
 	}
 	
 	private static void initializeOutFile(String filename, FileWriter out) {
@@ -85,6 +88,8 @@ public class Translator {
 		}
 	}
 	
+	
+	
 	// Private parsing method
 	private static void parseCmd(String cmd, FileWriter out) {
 		String line_result = "";
@@ -92,64 +97,138 @@ public class Translator {
 		if (varAssign(modified_cmd, false)) {
 			 String[] cur = modified_cmd.split(" ");
 			 String[] list_for_expr = modified_cmd.split("=");
-			 if (!variable_list.contains(cur[0])) {
+			 if (!variable_list.containsKey(cur[0])) {
 				 if (intVal.matcher(cur[2]).find()) {
-					 line_result += "int " + modified_cmd;
+					 line_result += "Integer " + modified_cmd;
+					 variable_list.put(cur[0], "Integer");
 				 }else if (strVal.matcher(cur[2]).find()) {
 					 line_result += "String " + modified_cmd;
+					 variable_list.put(cur[0], "String");
 				 }else if (bool.matcher(cur[2]).find()) {
-					 line_result += "boolean " + cur[0] + cur[1];
-					 if (cur[2] == "TRUE") {
+					 line_result += "Boolean " + cur[0] + cur[1];
+					 if (cur[2].equals("TRUE")) {
+						 line_result += "true";
+					 }else {
+						 line_result += "false";
+					 }
+					 variable_list.put(cur[0], "String");
+				 }else if (expr.matcher(list_for_expr[1].trim()).find()) {
+					 line_result += "Integer " + modified_cmd;
+					 variable_list.put(cur[0], "Integer");
+				 }else if (var.matcher(cur[2]).find()) {
+					 if (!variable_list.containsKey(cur[2])) {
+						 System.out.println("Undeclared variable!");
+						 System.exit(0);
+					 }else {
+						 line_result += variable_list.get(cur[2]) + " " + modified_cmd;
+						 variable_list.put(cur[0], variable_list.get(cur[2]));
+					 }
+				 }	 
+			 }else {
+				 if (intVal.matcher(cur[2]).find() || strVal.matcher(cur[2]).find()) {
+					 line_result += modified_cmd;
+				 }else if (bool.matcher(cur[2]).find()) {
+					 line_result += cur[0] + cur[1];
+					 if (cur[2].equals("TRUE")) {
 						 line_result += "true";
 					 }else {
 						 line_result += "false";
 					 }
 				 }else if (expr.matcher(list_for_expr[1].trim()).find()) {
-					 line_result += "int " + modified_cmd;
-				 }
-				 variable_list.add(cur[0]);	 
-			 }else {
-				 if (bool.matcher(cur[2]).find()) {
-					 if (cur[2] == "TRUE") {
-						 line_result += "true";
-					 }else {
-						 line_result += "false";
-					 }
-				 }else {
 					 line_result += modified_cmd;
+				 }else if (var.matcher(cur[2]).find()) {
+					 if (!variable_list.containsKey(cur[2])) {
+						 System.out.println("Undeclared variable!");
+						 System.exit(0);
+					 }else {
+						 line_result += modified_cmd;
+					 }
 				 }
 			 }
 			 line_result += ";";
 		}else if (if_check(modified_cmd, false)) {
-			line_result += modified_cmd.split("\\[")[0] + "{";
+			String[] cur = modified_cmd.split(" ");
+			String expression = "";
+			for (int i=1; i< cur.length-1; i++) {
+				if (i == cur.length-2)
+					expression += cur[i];
+				else
+					expression += cur[i] + " ";
+			}
+			System.out.println(expression);
+			if (comparative(expression.substring(1, expression.length()-1), false)) {
+				line_result += modified_cmd.split("\\[")[0] + "{";
+			}else {
+				line_result += "if (" + 
+			translate_bool_expr(modified_cmd.substring(3, modified_cmd.length()-1)) + "{";
+			}
 		}else if (else_check(modified_cmd, false)) {
 			line_result += modified_cmd.split("\\[")[0] + "{";
 		}else if (loop(modified_cmd, false)) {
-			line_result += modified_cmd.split("\\[")[0] + "{";
+			String[] cur = modified_cmd.split(" ");
+			String expression = "";
+			for (int i=1; i< cur.length-1; i++) {
+				if (i == cur.length-2)
+					expression += cur[i];
+				else
+					expression += cur[i] + " ";
+			}
+			if (comparative(expression.substring(1, expression.length()-1), false)) {
+				line_result += modified_cmd.split("\\[")[0] + "{";
+			}else {
+				line_result += "while (" + 
+					translate_bool_expr(modified_cmd.substring(7, modified_cmd.length()-1)) + "{";
+			}
 		}else if (end_sign(modified_cmd, false)){
 			line_result += "}";
 		}else if (print_val(modified_cmd, false)) {
-			line_result += "System.out.println(";
+			line_result += "System.out.print(";
 			String print_val =
-			modified_cmd.substring(modified_cmd.indexOf("(")+1,modified_cmd.indexOf(")"));		
-			line_result += print_val + ");";
+			modified_cmd.substring(modified_cmd.indexOf("(")+1,modified_cmd.indexOf(")"));
+			if (bool.matcher(print_val).find()) {
+				line_result += print_val.toLowerCase() + ");";
+			}else {
+				line_result += print_val + ");";
+			}
 		}else if (print_var(modified_cmd, false)){
-			line_result += "System.out.println(";
+			line_result += "System.out.print(";
 			String print_var = 
 			modified_cmd.substring(modified_cmd.indexOf("(")+1,modified_cmd.indexOf(")"));
-			line_result += print_var + ");";
+			if (bool.matcher(print_var).find()) {
+				line_result += print_var.toLowerCase() + ");";
+			}else {
+				line_result += print_var + ");";
+			}
 		}
 		else {
 			System.out.println("Invalid code detected.");
 			System.exit(0);
 		}
-		System.out.println(line_result);
+		System.out.println(line_result); // DEBUG
 		try {
 			out.write(line_result);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	private static String translate_bool_expr(String str) {
+		String result = "";
+		String[] substr = str.split("");
+		for (String s : substr) {
+			if (s.equals("^")) {
+				result += "&&";
+			}else if (s.equals("#")) {
+				result += "||";
+			}else if ("TRUE".contains(s) || "FALSE".contains(s)) {
+				result += s.toLowerCase();
+			}else {
+				result += s;
+			}
+			//System.out.println("Check: " + result);
+		}
+		return result;
 	}
 	
 	private static boolean varAssign(String cmd, boolean print) {
