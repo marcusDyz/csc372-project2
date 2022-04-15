@@ -57,11 +57,12 @@ public class Translator {
 			        System.out.println("File already exists.");
 			      }
 				FileWriter writer = new FileWriter(output);
-				while (scanner.hasNextLine()) {
+				initializeOutFile(output_filename.split("\\.")[0], writer);while (scanner.hasNextLine()) {
 					String cmd = scanner.nextLine();
 					parseCmd(cmd, writer);
 					// TODO Parse every line and translate to a Java code file.
 				}
+				writer.write("}}");
 				writer.close();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -71,6 +72,16 @@ public class Translator {
 			
 		}
 		
+	}
+	private static void initializeOutFile(String filename, FileWriter out) {
+		String result = "public class " + filename + "{"
+				+ "public static void main(String[] args) {";
+		try {
+			out.write(result);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	// Private parsing method
@@ -107,14 +118,18 @@ public class Translator {
 			line_result += print_val + ");";
 		}else if (print_var(modified_cmd, false)){
 			line_result += "System.out.println(";
+			//String print_var = 
+			//modified_cmd.substring(modified_cmd.indexOf("(")+1,modified_cmd.indexOf(")"));
 			String print_var = 
-			modified_cmd.substring(modified_cmd.indexOf("(")+1,modified_cmd.indexOf(")"));
+			modified_cmd.substring(6, modified_cmd.length()-1);
+			//System.out.println(print_var);
 			line_result += print_var + ");";
 		}
 		else {
 			System.out.println("Invalid code detected.");
 			System.exit(0);
 		}
+		line_result += "\n";
 		System.out.println(line_result);
 		try {
 			out.write(line_result);
@@ -142,8 +157,9 @@ public class Translator {
 		boolean match = false;
 		if(m.find()) {
 			match = true;
+			System.out.println(m.group(1));
 			match = match && expr(m.group(1), print);
-			if (!(variable_list.contains(m.group(1)))) {
+			if (var(m.group(1),print) && !(variable_list.contains(m.group(1)))) {
 				System.out.println("COMPILE ERROR: That variable has not been declared.");
 				System.exit(0);
 			}
@@ -163,7 +179,6 @@ public class Translator {
 		}
 		return match;
 	}
-
 
 	private static boolean if_check(String cmd, boolean print) {
 		Matcher m = if_check.matcher(cmd);
@@ -241,6 +256,16 @@ public class Translator {
 	private static boolean expr(String cmd, boolean print) {
 		boolean match = val(cmd, print);
 		if(!match) {
+			/*
+			System.out.println(cmd.charAt(0));
+			if (!(cmd.charAt(0) == '(' )|| !(cmd.charAt(cmd.length()-1) == ')')) {
+				System.out.println("SYNTAX ERROR: Expression should have parentheses.");
+				System.exit(0);
+			}*/
+			// Might be more complicated than anticipated to determine if 
+			// expression has correct number of parentheses.
+			// Restrict to only be left/right-associative?
+			// Maybe add or statements for checking groups 1 and 2. Ask tomorrow.
 			Matcher m = expr.matcher(cmd);
 			match = m.find();
 			match = match && expr(m.group(1),print);
@@ -334,6 +359,10 @@ public class Translator {
 	
 	private static boolean bool(String cmd, boolean print) {
 		Matcher m = bool.matcher(cmd);
+		if (cmd == "true" || cmd == "false") {
+			System.out.println("SYNTAX ERROR: Booleans should be capitalized.");
+			System.exit(0);
+		}
 		boolean match = false;
 		match = m.find();
 		if (print)
