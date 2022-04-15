@@ -1,0 +1,8 @@
+x = 2
+y = ((4 * 3) + 5)
+print(y)
+z = (x + y)
+print(z)
+b = TRUE
+str = "hello world"
+print(str)
