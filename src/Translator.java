@@ -63,7 +63,7 @@ public class Translator {
 					parseCmd(cmd, writer);
 					// TODO Parse every line and translate to a Java code file.
 				}
-				writer.write("}");
+				writer.write("}}");
 				writer.close();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
