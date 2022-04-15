@@ -7,7 +7,6 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.sun.org.apache.xerces.internal.impl.dv.dtd.StringDatatypeValidator;
 
 public class Translator {
 	private static Pattern var_assign = Pattern.compile("^(.+) = (.+)$");
@@ -57,7 +56,7 @@ public class Translator {
 			        System.out.println("File already exists.");
 			      }
 				FileWriter writer = new FileWriter(output);
-				initializeOutFile(output_filename.split(".")[0], writer);
+				initializeOutFile(output_filename.split("\\.")[0], writer);
 				while (scanner.hasNextLine()) {
 					String cmd = scanner.nextLine();
 					parseCmd(cmd, writer);
@@ -108,13 +107,14 @@ public class Translator {
 					 }
 				 }
 			 }
+			 line_result += ";";
 			 System.out.println(line_result);
 		}else if (if_check(modified_cmd, false)) {
-			
+			line_result += modified_cmd.split("\\[")[0] + "{";
 		}else if (else_check(modified_cmd, false)) {
-			 
+			line_result += modified_cmd.split("\\[")[0] + "{";
 		}else if (loop(modified_cmd, false)) {
-			
+			line_result += modified_cmd.split("\\[")[0] + "{";
 		}else if (end_sign(modified_cmd, false)){
 			line_result += "}";
 		}else if (print_val(modified_cmd, false)) {

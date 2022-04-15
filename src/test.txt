@@ -1,0 +1,9 @@
+x = 3
+print(x)
+if (x == 3) [
+    print("3 + 3 = ")
+    print(3 + 3)
+]
+else [
+    print(1)
+]
