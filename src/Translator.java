@@ -38,7 +38,7 @@ public class Translator {
 			String input = scanner.nextLine();
 			while (!input.equals("exit")) { 
 				// TODO Parse the input string and write it in Java code then print the output.
-				comparative(input, true);
+				varAssign(input, true);
 				System.out.print(">> ");
 				input = scanner.nextLine();
 			}
@@ -91,10 +91,9 @@ public class Translator {
 		String modified_cmd = cmd.trim();
 		if (varAssign(modified_cmd, false)) {
 			 String[] cur = modified_cmd.split(" ");
-			 if (variable_list.contains(cur[0])) {
-				 line_result += modified_cmd;
-			 }else {
-				 if (intVal.matcher(cur[2]).find() || expr.matcher(cur[2]).find()) {
+			 String[] list_for_expr = modified_cmd.split("=");
+			 if (!variable_list.contains(cur[0])) {
+				 if (intVal.matcher(cur[2]).find()) {
 					 line_result += "int " + modified_cmd;
 				 }else if (strVal.matcher(cur[2]).find()) {
 					 line_result += "String " + modified_cmd;
@@ -105,10 +104,22 @@ public class Translator {
 					 }else {
 						 line_result += "false";
 					 }
+				 }else if (expr.matcher(list_for_expr[1].trim()).find()) {
+					 line_result += "int " + modified_cmd;
+				 }
+				 variable_list.add(cur[0]);	 
+			 }else {
+				 if (bool.matcher(cur[2]).find()) {
+					 if (cur[2] == "TRUE") {
+						 line_result += "true";
+					 }else {
+						 line_result += "false";
+					 }
+				 }else {
+					 line_result += modified_cmd;
 				 }
 			 }
 			 line_result += ";";
-			 System.out.println(line_result);
 		}else if (if_check(modified_cmd, false)) {
 			line_result += modified_cmd.split("\\[")[0] + "{";
 		}else if (else_check(modified_cmd, false)) {
@@ -251,14 +262,14 @@ public class Translator {
 	}
 	
 	private static boolean expr(String cmd, boolean print) {
-		boolean match = val(cmd, print);
-		if(!match) {
-			Matcher m = expr.matcher(cmd);
-			match = m.find();
+		Matcher m = expr.matcher(cmd);
+		boolean match = m.find();
+		if (match) {
 			match = match && expr(m.group(1),print);
 			match = match && op(m.group(2),print);
 			match = match && val(m.group(3),print);
-		}
+		}else 
+			match = val(cmd, print);
 		if (print)
 			printMsg(match, "<expr>", cmd, "expr");
 		return match;
