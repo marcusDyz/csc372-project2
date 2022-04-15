@@ -1,0 +1,14 @@
+x = CLA1
+while (x <= CLA2) [
+    y = x
+    while (y > 0) [
+        if (y == 1) [
+            print("\n")
+        ]
+        else [ 
+            print("*")
+        ]
+        y = (y - 1)
+    ]
+    x = (x + 1)
+]
