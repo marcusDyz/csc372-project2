@@ -93,12 +93,11 @@ public class Translator {
 	}
 	
 	/*
-	 * Purpose: intialize the newly created java file
+	 * Purpose: initialize the newly created java file
 	 * Parameter:
 	 * 		filename: name of the input file, String
-	 * 		out: 
-	 * RetVal: 
-	 * 		
+	 * 		out: the FileWriter that can be used to write line into output file
+	 * RetVal: None
 	 */
 	private static void initializeOutFile(String filename, FileWriter out) {
 		String result = "public class " + filename + "{"
@@ -111,6 +110,12 @@ public class Translator {
 		}
 	}
 	
+	/*
+	 * Purpose: parsing method for interative system
+	 * Parameter:
+	 * 		cmd: the command from standard input, String
+	 * RetVal: None
+	 */
 	private static void parseCmd(String cmd) {
 		String modified_cmd = cmd.trim();
 		if (varAssign(modified_cmd, true)) {
@@ -132,8 +137,15 @@ public class Translator {
 		}
 	}
 	
-	// Private parsing method
-	private static void parseCmd(String cmd, FileWriter out, boolean print) {
+	/*
+	 * Purpose: parsing method, write the translated java code string into the output file, 
+	 * 			print the parsing process if user invoke print field to true
+	 * Parameter:
+	 * 		cmd: the command from input file, String
+	 * 		out: the FileWriter that can be used to write line into output file
+	 * RetVal: None
+	 */
+	private static void parseCmd(String cmd, FileWriter out) {
 		String line_result = "";
 		String modified_cmd = cmd.trim();
 		if (varAssign(modified_cmd, print)) {
@@ -253,6 +265,13 @@ public class Translator {
 		}
 	}
 	
+	/*
+	 * Purpose: private method to translate bool_expr to java code format
+	 * Parameter:
+	 * 		str: bool_expr from input file, String
+	 * RetVal: 
+	 * 		result: the bool_expr of java format, String
+	 */
 	private static String translate_bool_expr(String str) {
 		String result = "";
 		String[] substr = str.split("");
@@ -270,6 +289,14 @@ public class Translator {
 		return result;
 	}
 	
+	/*
+	 * Purpose: parsing method for variable assignment
+	 * Parameter:
+	 * 		cmd: the command from input file, String
+	 * 		print: a boolean variable that determines whether print parsing process or not
+	 * RetVal: 
+	 * 		match: return true if cmd can be parsed as variable assignment
+	 */
 	private static boolean varAssign(String cmd, boolean print) {
 		Matcher m = var_assign.matcher(cmd);
 		boolean match = false;
@@ -283,6 +310,14 @@ public class Translator {
 		return match;
 	}
 	
+	/*
+	 * Purpose: parsing method for printing variable
+	 * Parameter:
+	 * 		cmd: the command from input file, String
+	 * 		print: a boolean variable that determines whether print parsing process or not
+	 * RetVal: 
+	 * 		match: return true if cmd can be parsed as variable assignment
+	 */
 	public static boolean print_var(String cmd, boolean print) {
 		Matcher m = print_var.matcher(cmd);
 		boolean match = false;
@@ -294,6 +329,14 @@ public class Translator {
 		return match;
 	}
 	
+	/*
+	 * Purpose: parsing method for printing value
+	 * Parameter:
+	 * 		cmd: the command from input file, String
+	 * 		print: a boolean variable that determines whether print parsing process or not
+	 * RetVal: 
+	 * 		match: return true if cmd can be parsed as variable assignment
+	 */
 	public static boolean print_val(String cmd, boolean print) {
 		Matcher m = print_val.matcher(cmd);
 		boolean match = false;
@@ -305,7 +348,14 @@ public class Translator {
 		return match;
 	}
 
-
+	/*
+	 * Purpose: parsing method for if statement
+	 * Parameter:
+	 * 		cmd: the command from input file, String
+	 * 		print: a boolean variable that determines whether print parsing process or not
+	 * RetVal: 
+	 * 		match: return true if cmd can be parsed as variable assignment
+	 */
 	private static boolean if_check(String cmd, boolean print) {
 		Matcher m = if_check.matcher(cmd);
 		boolean match = false;
@@ -318,6 +368,14 @@ public class Translator {
 		return match;
 	}
 	
+	/*
+	 * Purpose: parsing method for else statement
+	 * Parameter:
+	 * 		cmd: the command from input file, String
+	 * 		print: a boolean variable that determines whether print parsing process or not
+	 * RetVal: 
+	 * 		match: return true if cmd can be parsed as variable assignment
+	 */
 	private static boolean else_check(String cmd, boolean print) {
 		Matcher m = else_check.matcher(cmd);
 		boolean match = false;
@@ -329,6 +387,14 @@ public class Translator {
 		return match;
 	}
 	
+	/*
+	 * Purpose: parsing method for while loop
+	 * Parameter:
+	 * 		cmd: the command from input file, String
+	 * 		print: a boolean variable that determines whether print parsing process or not
+	 * RetVal: 
+	 * 		match: return true if cmd can be parsed as variable assignment
+	 */
 	private static boolean loop(String cmd, boolean print) {
 		Matcher m = loop.matcher(cmd);
 		boolean match = false;
@@ -342,6 +408,14 @@ public class Translator {
 	}
 
 
+	/*
+	 * Purpose: parsing method for boolean expression
+	 * Parameter:
+	 * 		cmd: the command from input file, String
+	 * 		print: a boolean variable that determines whether print parsing process or not
+	 * RetVal: 
+	 * 		match: return true if cmd can be parsed as variable assignment
+	 */
 	private static boolean bool_expr(String cmd, boolean print) { // TODO
 		Matcher m = bool_expr.matcher(cmd);
 		boolean match = m.find();
@@ -355,6 +429,14 @@ public class Translator {
 		return match;
 	}
 
+	/*
+	 * Purpose: parsing method for bool expression 1
+	 * Parameter:
+	 * 		cmd: the command from input file, String
+	 * 		print: a boolean variable that determines whether print parsing process or not
+	 * RetVal: 
+	 * 		match: return true if cmd can be parsed as variable assignment
+	 */
 	private static boolean bool_expr1(String cmd, boolean print) { // TODO 
 		Matcher m = comparative.matcher(cmd);
 		boolean match = false;
@@ -379,6 +461,14 @@ public class Translator {
 		return match;
 	}
 	
+	/*
+	 * Purpose: Evaluate whether the input line is an expression.
+	 * Parameter:
+	 * 		cmd: line being read from input file, String
+	 * 		print: whether parsing should be printed, boolean
+	 * RetVal: 
+	 * 		match: whether or not the regular expressions match, boolean
+	 */
 	private static boolean expr(String cmd, boolean print) {
 		Matcher m = expr.matcher(cmd);
 		boolean match = m.find();
@@ -393,6 +483,14 @@ public class Translator {
 		return match;
 	}
 	
+	/*
+	 * Purpose: Evaluate whether the input line is a comparator operator.
+	 * Parameter:
+	 * 		cmd: line being read from input file, String
+	 * 		print: whether parsing should be printed, boolean
+	 * RetVal: 
+	 * 		match: whether or not the regular expressions match, boolean
+	 */
 	private static boolean comparator(String cmd, boolean print) {
 		Matcher m = comparator.matcher(cmd);
 		boolean match = false;
@@ -402,6 +500,14 @@ public class Translator {
 		return match;
 	}
 	
+	/*
+	 * Purpose: Evaluate whether the input line is a comparative statement.
+	 * Parameter:
+	 * 		cmd: line being read from input file, String
+	 * 		print: whether parsing should be printed, boolean
+	 * RetVal: 
+	 * 		match: whether or not the regular expressions match, boolean
+	 */
 	private static boolean comparative(String cmd, boolean print) {
 		Matcher m = comparative.matcher(cmd);
 		boolean match = false;
@@ -416,6 +522,14 @@ public class Translator {
 		return match;
 	}
 	
+	/*
+	 * Purpose: Evaluate whether the input line is an end sign.
+	 * Parameter:
+	 * 		cmd: line being read from input file, String
+	 * 		print: whether parsing should be printed, boolean
+	 * RetVal: 
+	 * 		match: whether or not the regular expressions match, boolean
+	 */
 	private static boolean end_sign(String cmd, boolean print) {
 		Matcher m = end_sign.matcher(cmd);
 		boolean match = m.find();
@@ -424,6 +538,14 @@ public class Translator {
 		return match;
 	}
 	
+	/*
+	 * Purpose: Evaluate whether the input line is a variable.
+	 * Parameter:
+	 * 		cmd: line being read from input file, String
+	 * 		print: whether parsing should be printed, boolean
+	 * RetVal: 
+	 * 		match: whether or not the regular expressions match, boolean
+	 */
 	private static boolean var(String cmd, boolean print) {
 		Matcher m = var.matcher(cmd);
 		boolean match = m.find();
@@ -432,6 +554,14 @@ public class Translator {
 		return match;
 	}
 	
+	/*
+	 * Purpose: Evaluate whether the input line is a value.
+	 * Parameter:
+	 * 		cmd: line being read from input file, String
+	 * 		print: whether parsing should be printed, boolean
+	 * RetVal: 
+	 * 		match: whether or not the regular expressions match, boolean
+	 */
 	private static boolean val(String cmd, boolean print) {
 		Matcher m = intVal.matcher(cmd);
 		boolean match = m.find();
@@ -454,6 +584,14 @@ public class Translator {
 		return match;
 	}
 	
+	/*
+	 * Purpose: Evaluate whether the input line is an integer operator.
+	 * Parameter:
+	 * 		cmd: line being read from input file, String
+	 * 		print: whether parsing should be printed, boolean
+	 * RetVal: 
+	 * 		match: whether or not the regular expressions match, boolean
+	 */
 	private static boolean op(String cmd, boolean print) {
 		Matcher m = op.matcher(cmd);
 		boolean match = false;
@@ -463,6 +601,14 @@ public class Translator {
 		return match;
 	}
 	
+	/*
+	 * Purpose: Evaluate whether the input line is a boolean.
+	 * Parameter:
+	 * 		cmd: line being read from input file, String
+	 * 		print: whether parsing should be printed, boolean
+	 * RetVal: 
+	 * 		match: whether or not the regular expressions match, boolean
+	 */
 	private static boolean bool(String cmd, boolean print) {
 		Matcher m = bool.matcher(cmd);
 		boolean match = false;
@@ -472,6 +618,15 @@ public class Translator {
 		return match;
 	}
 		
+	/*
+	 * Purpose: Evaluate whether the input line is an expression.
+	 * Parameter:
+	 * 		match: whether the line was parsed or not, boolean
+	 * 		ntName: type name as in the grammar, String
+	 * 		cmd: line being read from input file, String
+	 * 		item: type of statement being parsed, String
+	 * RetVal: None
+	 */
 	private static void printMsg(boolean match, String ntName, String cmd, String item) {
 		if(match)
 			System.out.println(ntName + ": " + cmd);
