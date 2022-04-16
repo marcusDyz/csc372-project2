@@ -6,6 +6,19 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/*
+ * Author: Yizhuo Deng and Isabelle Boyle
+ * Course: CSC 372
+ * Description: A Translator class that can be used to translate our newly created programming language.
+ * Fields - 
+ * 	Most of the private fields of this class are Pattern objects used to parse a string.
+ * 	print: a private boolean variable indicates whether user want to print the parsing process explicitly, 
+ * 			user can change its value by typing [true] in the second command line arguments
+ * 	variable_list: a HashMap used to keep track of previously declared variables and their type
+ * Method - 
+ * 	All methods are private and cannot be invoke from outside
+ * 	Most of the methods are for the parsing purpose
+ */
 
 public class Translator {
 	private static Pattern var_assign = Pattern.compile("^(.+) = (.+)$");
@@ -21,28 +34,25 @@ public class Translator {
 	private static Pattern end_sign = Pattern.compile("^\\]$");
 	private static Pattern intVal = Pattern.compile("^\\d+$");
 	private static Pattern strVal = Pattern.compile("^\"\\w+\"$");
-	private static Pattern and_or = Pattern.compile("^#|\\^$");
 	private static Pattern var = Pattern.compile("^\\w+$");
 	private static Pattern op = Pattern.compile("^[+-/%]{1}|\\*$");
 	private static Pattern bool = Pattern.compile("^TRUE|FALSE$");
-	private int end_num = 0; 
+	private static boolean print = false;
 	private static HashMap<String, String> variable_list = new HashMap<String, String>();
 	
 	
 	public static void main(String[] args) {
 		if (args.length == 0) { // Interactive system
-			// TODO adding explicit parsing feature into Interactive system
+			// adding explicit parsing feature into Interactive system
 			Scanner scanner = new Scanner(System.in);
 			System.out.print(">> ");
 			String input = scanner.nextLine();
 			while (!input.equals("exit")) { 
-				// TODO Parse the input string and write it in Java code then print the output.
-				varAssign(input, true);
+				parseCmd(input);
 				System.out.print(">> ");
 				input = scanner.nextLine();
 			}
 			System.out.println("Bye!");
-			
 		}else { // Reading file from StdIn
 			try {
 				Scanner scanner = new Scanner(new File(args[0]));
@@ -51,22 +61,27 @@ public class Translator {
 				File output = new File(output_filename);
 				if (output.createNewFile()) {
 			        System.out.println("File created: " + output.getName());
-			      } else {
+			    }else {
 			        System.out.println("File already exists.");
-			      }
+			    }
+				if (args[1].equals("true")) 
+					print = true;
 				FileWriter writer = new FileWriter(output);
 				initializeOutFile(output_filename.split("\\.")[0], writer);
 				if (args.length > 1) {
-					for (int i=1; i<args.length; i++) {
-						String cla = "CLA" + (i) + " = " + args[i];
-						System.out.println(cla);
-						parseCmd(cla,writer);
+					for (int i=2; i<args.length; i++) {
+						String cla = "CLA" + (i-1) + " = " + args[i];
+						parseCmd(cla,writer, print);
 					}
 				}
 				while (scanner.hasNextLine()) {
 					String cmd = scanner.nextLine();
-					parseCmd(cmd, writer);
-					// TODO Parse every line and translate to a Java code file.
+					if (!(cmd.strip() == "")) {
+						if (!(cmd.charAt(0) == '$')) {
+								parseCmd(cmd, writer, print);
+						}
+						}
+					// Parse every line and translate to a Java code file.
 				}
 				writer.write("}}");
 				writer.close();
@@ -77,6 +92,14 @@ public class Translator {
 		}
 	}
 	
+	/*
+	 * Purpose: intialize the newly created java file
+	 * Parameter:
+	 * 		filename: name of the input file, String
+	 * 		out: 
+	 * RetVal: 
+	 * 		
+	 */
 	private static void initializeOutFile(String filename, FileWriter out) {
 		String result = "public class " + filename + "{"
 				+ "public static void main(String[] args) {";
@@ -88,13 +111,32 @@ public class Translator {
 		}
 	}
 	
-	
+	private static void parseCmd(String cmd) {
+		String modified_cmd = cmd.trim();
+		if (varAssign(modified_cmd, true)) {
+			return;
+		}else if(if_check(modified_cmd, true)) {
+			return;
+		}else if (else_check(modified_cmd, true)) {
+			return;
+		}else if (loop(modified_cmd, true)) {
+			return;
+		}else if (end_sign(modified_cmd, true)) {
+			return;
+		}else if (print_val(modified_cmd, true)) {
+			return;
+		}else if (print_var(modified_cmd, true)) {
+			return;
+		}else {
+			System.out.println("Invalid code detected.");
+		}
+	}
 	
 	// Private parsing method
-	private static void parseCmd(String cmd, FileWriter out) {
+	private static void parseCmd(String cmd, FileWriter out, boolean print) {
 		String line_result = "";
 		String modified_cmd = cmd.trim();
-		if (varAssign(modified_cmd, false)) {
+		if (varAssign(modified_cmd, print)) {
 			 String[] cur = modified_cmd.split(" ");
 			 String[] list_for_expr = modified_cmd.split("=");
 			 if (!variable_list.containsKey(cur[0])) {
@@ -146,7 +188,7 @@ public class Translator {
 				 }
 			 }
 			 line_result += ";";
-		}else if (if_check(modified_cmd, false)) {
+		}else if (if_check(modified_cmd, print)) {
 			String[] cur = modified_cmd.split(" ");
 			String expression = "";
 			for (int i=1; i< cur.length-1; i++) {
@@ -155,16 +197,15 @@ public class Translator {
 				else
 					expression += cur[i] + " ";
 			}
-			System.out.println(expression);
 			if (comparative(expression.substring(1, expression.length()-1), false)) {
 				line_result += modified_cmd.split("\\[")[0] + "{";
 			}else {
-				line_result += "if (" + 
+				line_result += "if " + 
 			translate_bool_expr(modified_cmd.substring(3, modified_cmd.length()-1)) + "{";
 			}
-		}else if (else_check(modified_cmd, false)) {
+		}else if (else_check(modified_cmd, print)) {
 			line_result += modified_cmd.split("\\[")[0] + "{";
-		}else if (loop(modified_cmd, false)) {
+		}else if (loop(modified_cmd, print)) {
 			String[] cur = modified_cmd.split(" ");
 			String expression = "";
 			for (int i=1; i< cur.length-1; i++) {
@@ -179,9 +220,9 @@ public class Translator {
 				line_result += "while (" + 
 					translate_bool_expr(modified_cmd.substring(7, modified_cmd.length()-1)) + "{";
 			}
-		}else if (end_sign(modified_cmd, false)){
+		}else if (end_sign(modified_cmd, print)){
 			line_result += "}";
-		}else if (print_val(modified_cmd, false)) {
+		}else if (print_val(modified_cmd, print)) {
 			line_result += "System.out.print(";
 			String print_val =
 			modified_cmd.substring(modified_cmd.indexOf("(")+1,modified_cmd.indexOf(")"));
@@ -190,7 +231,7 @@ public class Translator {
 			}else {
 				line_result += print_val + ");";
 			}
-		}else if (print_var(modified_cmd, false)){
+		}else if (print_var(modified_cmd, print)){
 			line_result += "System.out.print(";
 			String print_var = 
 			modified_cmd.substring(modified_cmd.indexOf("(")+1,modified_cmd.indexOf(")"));
@@ -204,7 +245,6 @@ public class Translator {
 			System.out.println("Invalid code detected.");
 			System.exit(0);
 		}
-		System.out.println(line_result); // DEBUG
 		try {
 			out.write(line_result);
 		} catch (IOException e) {
@@ -226,7 +266,6 @@ public class Translator {
 			}else {
 				result += s;
 			}
-			//System.out.println("Check: " + result);
 		}
 		return result;
 	}
@@ -374,15 +413,6 @@ public class Translator {
 			if (print)
 				printMsg(match, "<comparative>", cmd, "comparative");
 		}
-		return match;
-	}
-	
-	private static boolean and_or(String cmd, boolean print) {
-		Matcher m = and_or.matcher(cmd);
-		boolean match = false;
-		match = m.find();
-		if (print)
-			printMsg(match, "<and_or>", cmd, "And|Or");
 		return match;
 	}
 	
