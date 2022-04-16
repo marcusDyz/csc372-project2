@@ -57,9 +57,15 @@ public class Translator {
 			        System.out.println("File already exists.");
 			      }
 				FileWriter writer = new FileWriter(output);
-				initializeOutFile(output_filename.split("\\.")[0], writer);while (scanner.hasNextLine()) {
+				initializeOutFile(output_filename.split("\\.")[0], writer); 
+				while (scanner.hasNextLine()) {
 					String cmd = scanner.nextLine();
-					parseCmd(cmd, writer);
+					//varAssign(cmd, true);
+					if (!(cmd.strip() == "")) {
+					if (!(cmd.charAt(0) == '$')) {
+							parseCmd(cmd, writer);
+					}
+					}
 					// TODO Parse every line and translate to a Java code file.
 				}
 				writer.write("}}");
@@ -90,19 +96,26 @@ public class Translator {
 		String modified_cmd = cmd.trim();
 		if (varAssign(modified_cmd, false)) {
 			 String[] cur = modified_cmd.split(" ");
-			 if (intVal.matcher(cur[2]).find()) {
-				 line_result += "int " + modified_cmd;
-			 } else if (strVal.matcher(cur[2]).find()) {
-				 line_result += "String " + modified_cmd;
-			 } else if (bool.matcher(cur[2]).find()) {
-				 line_result += "boolean " + cur[0] + cur[1];
-				 if (cur[2] == "TRUE") {
-					 line_result += "true";
-				 } else {
-					 line_result += "false";
+			 String[] list_for_expr = modified_cmd.split("=");
+			 System.out.println(cur[0]);
+			 if (variable_list.contains(cur[0])) {
+				 if (intVal.matcher(cur[2]).find()) {
+					 line_result += "int " + modified_cmd;
+				 }else if (strVal.matcher(cur[2]).find()) {
+					 line_result += "String " + modified_cmd;
+				 }else if (bool.matcher(cur[2]).find()) {
+					 line_result += "boolean " + cur[0] + cur[1];
+					 if (cur[2] == "TRUE") {
+						 line_result += "true";
+					 }else {
+						 line_result += "false";
+					 }
+				 }else if (expr.matcher(list_for_expr[1].trim()).find()) {
+					 line_result += "int " + modified_cmd;
 				 }
+			variable_list.add(cur[0]);	 
 			 }
-			line_result += ";";
+			 line_result += ";";
 		}else if (if_check(modified_cmd, false)) {
 			
 		}else if (else_check(modified_cmd, false)) {
@@ -135,6 +148,7 @@ public class Translator {
 			e.printStackTrace();
 		}
 	}
+
 	
 	private static boolean varAssign(String cmd, boolean print) {
 		Matcher m = var_assign.matcher(cmd);
