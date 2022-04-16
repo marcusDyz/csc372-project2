@@ -263,7 +263,15 @@ public class Translator {
 		}
 		return match;
 	}
-	
+
+	/*
+	 * Purpose: Evaluate whether the input line is an expression.
+	 * Parameter:
+	 * 		cmd: line being read from input file, String
+	 * 		print: whether parsing should be printed, boolean
+	 * RetVal: 
+	 * 		match: whether or not the regular expressions match, boolean
+	 */
 	private static boolean expr(String cmd, boolean print) {
 		boolean match = val(cmd, print);
 		if(!match) {
@@ -282,6 +290,14 @@ public class Translator {
 		return match;
 	}
 	
+	/*
+	 * Purpose: Evaluate whether the input line is a comparator operator.
+	 * Parameter:
+	 * 		cmd: line being read from input file, String
+	 * 		print: whether parsing should be printed, boolean
+	 * RetVal: 
+	 * 		match: whether or not the regular expressions match, boolean
+	 */
 	private static boolean comparator(String cmd, boolean print) {
 		Matcher m = comparator.matcher(cmd);
 		boolean match = false;
@@ -291,6 +307,14 @@ public class Translator {
 		return match;
 	}
 	
+	/*
+	 * Purpose: Evaluate whether the input line is a comparative statement.
+	 * Parameter:
+	 * 		cmd: line being read from input file, String
+	 * 		print: whether parsing should be printed, boolean
+	 * RetVal: 
+	 * 		match: whether or not the regular expressions match, boolean
+	 */
 	private static boolean comparative(String cmd, boolean print) {
 		Matcher m = comparative.matcher(cmd);
 		boolean match = false;
@@ -304,16 +328,15 @@ public class Translator {
 		}
 		return match;
 	}
-	
-	private static boolean and_or(String cmd, boolean print) {
-		Matcher m = and_or.matcher(cmd);
-		boolean match = false;
-		match = m.find();
-		if (print)
-			printMsg(match, "<and_or>", cmd, "And|Or");
-		return match;
-	}
-	
+
+	/*
+	 * Purpose: Evaluate whether the input line is an end sign.
+	 * Parameter:
+	 * 		cmd: line being read from input file, String
+	 * 		print: whether parsing should be printed, boolean
+	 * RetVal: 
+	 * 		match: whether or not the regular expressions match, boolean
+	 */
 	private static boolean end_sign(String cmd, boolean print) {
 		Matcher m = end_sign.matcher(cmd);
 		boolean match = m.find();
@@ -322,6 +345,14 @@ public class Translator {
 		return match;
 	}
 	
+	/*
+	 * Purpose: Evaluate whether the input line is a variable.
+	 * Parameter:
+	 * 		cmd: line being read from input file, String
+	 * 		print: whether parsing should be printed, boolean
+	 * RetVal: 
+	 * 		match: whether or not the regular expressions match, boolean
+	 */
 	private static boolean var(String cmd, boolean print) {
 		Matcher m = var.matcher(cmd);
 		boolean match = m.find();
@@ -331,6 +362,14 @@ public class Translator {
 		return match;
 	}
 	
+	/*
+	 * Purpose: Evaluate whether the input line is a value.
+	 * Parameter:
+	 * 		cmd: line being read from input file, String
+	 * 		print: whether parsing should be printed, boolean
+	 * RetVal: 
+	 * 		match: whether or not the regular expressions match, boolean
+	 */
 	private static boolean val(String cmd, boolean print) {
 		Matcher m = intVal.matcher(cmd);
 		boolean match = m.find();
@@ -353,6 +392,14 @@ public class Translator {
 		return match;
 	}
 	
+	/*
+	 * Purpose: Evaluate whether the input line is an integer operator.
+	 * Parameter:
+	 * 		cmd: line being read from input file, String
+	 * 		print: whether parsing should be printed, boolean
+	 * RetVal: 
+	 * 		match: whether or not the regular expressions match, boolean
+	 */
 	private static boolean op(String cmd, boolean print) {
 		Matcher m = op.matcher(cmd);
 		boolean match = false;
@@ -362,6 +409,14 @@ public class Translator {
 		return match;
 	}
 	
+	/*
+	 * Purpose: Evaluate whether the input line is a boolean.
+	 * Parameter:
+	 * 		cmd: line being read from input file, String
+	 * 		print: whether parsing should be printed, boolean
+	 * RetVal: 
+	 * 		match: whether or not the regular expressions match, boolean
+	 */
 	private static boolean bool(String cmd, boolean print) {
 		Matcher m = bool.matcher(cmd);
 		if (cmd == "true" || cmd == "false") {
@@ -374,7 +429,15 @@ public class Translator {
 			printMsg(match, "<bool>", cmd, "boolean");
 		return match;
 	}
-		
+	
+	/*
+	 * Purpose: Evaluate whether the input line is an expression.
+	 * Parameter:
+	 * 		match: whether the line was parsed or not, boolean
+	 * 		ntName: type name as in the grammar, String
+	 * 		cmd: line being read from input file, String
+	 * 		item: type of statement being parsed, String
+	 */
 	private static void printMsg(boolean match, String ntName, String cmd, String item) {
 		if(match)
 			System.out.println(ntName + ": " + cmd);
